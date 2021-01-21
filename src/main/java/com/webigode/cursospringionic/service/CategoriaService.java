@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.webigode.cursospringionic.domain.Categoria;
 import com.webigode.cursospringionic.repositories.CategoriaRepository;
+import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
 
 @Service
 public class CategoriaService {
@@ -21,7 +22,7 @@ public class CategoriaService {
 	
 	public Categoria findById(Integer id) {
 		Optional<Categoria> obj = repository.findById(id);
-		return obj.get();
+		return obj.orElseThrow(() -> new ObjectNotFoundException(id));
 	}
 	
 }
