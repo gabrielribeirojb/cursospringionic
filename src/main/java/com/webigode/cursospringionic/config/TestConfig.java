@@ -13,6 +13,7 @@ import com.webigode.cursospringionic.domain.Cidade;
 import com.webigode.cursospringionic.domain.Cliente;
 import com.webigode.cursospringionic.domain.Endereco;
 import com.webigode.cursospringionic.domain.Estado;
+import com.webigode.cursospringionic.domain.ItemPedido;
 import com.webigode.cursospringionic.domain.Pagamento;
 import com.webigode.cursospringionic.domain.PagamentoComBoleto;
 import com.webigode.cursospringionic.domain.PagamentoComCartao;
@@ -25,6 +26,7 @@ import com.webigode.cursospringionic.repositories.CidadeRepository;
 import com.webigode.cursospringionic.repositories.ClienteRepository;
 import com.webigode.cursospringionic.repositories.EnderecoRepository;
 import com.webigode.cursospringionic.repositories.EstadoRepository;
+import com.webigode.cursospringionic.repositories.ItemPedidoRepository;
 import com.webigode.cursospringionic.repositories.PagamentoRepository;
 import com.webigode.cursospringionic.repositories.PedidoRepository;
 import com.webigode.cursospringionic.repositories.ProdutoRepository;
@@ -56,6 +58,9 @@ public class TestConfig implements CommandLineRunner{
 	
 	@Autowired
 	private PagamentoRepository pagamentoRepository;
+	
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 	
 	@Override
 	public void run(String... args) throws Exception {
@@ -116,6 +121,19 @@ public class TestConfig implements CommandLineRunner{
 
 		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
 		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+		
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));	
 		
 	}
 

@@ -2,7 +2,9 @@ package com.webigode.cursospringionic.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,7 +26,7 @@ public class Produto implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
 	private String name;
-	private Double price;
+	private Double preco;
 	
 	@JsonIgnore
 	@ManyToMany
@@ -33,14 +36,25 @@ public class Produto implements Serializable{
 	)
 	private List<Categoria> categorias = new ArrayList<>();
 	
+	@OneToMany(mappedBy="id.produto")
+	private Set<ItemPedido> itens = new HashSet<>();
+	
 	public Produto() {
 	}
 	
-	public Produto(Integer id, String name, Double price) {
+	public Produto(Integer id, String name, Double preco) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.price = price;
+		this.preco = preco;
+	}
+	
+	public List<Pedido> getPedidos(){ 
+		List<Pedido> lista = new ArrayList<>();
+		for(ItemPedido item: itens) {
+			lista.add(item.getPedido());
+		}
+		return lista;
 	}
 
 	public Integer getId() {
@@ -59,12 +73,12 @@ public class Produto implements Serializable{
 		this.name = name;
 	}
 
-	public Double getPrice() {
-		return price;
+	public Double getPreco() {
+		return preco;
 	}
 
-	public void setPrice(Double price) {
-		this.price = price;
+	public void setPrice(Double preco) {
+		this.preco = preco;
 	}
 
 	public List<Categoria> getCategorias() {
@@ -73,6 +87,14 @@ public class Produto implements Serializable{
 
 	public void setCategorias(List<Categoria> categorias) {
 		this.categorias = categorias;
+	}
+	
+	public Set<ItemPedido> getItens() {
+		return itens;
+	}
+
+	public void setItens(Set<ItemPedido> itens) {
+		this.itens = itens;
 	}
 
 	@Override
