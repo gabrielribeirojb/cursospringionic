@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.webigode.cursospringionic.domain.Categoria;
+import com.webigode.cursospringionic.dto.CategoriaDTO;
 import com.webigode.cursospringionic.repositories.CategoriaRepository;
 import com.webigode.cursospringionic.service.excetions.DataIntegrityException;
 import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
@@ -48,6 +49,10 @@ public class CategoriaService {
 		catch(DataIntegrityViolationException e) {
 			throw new DataIntegrityException("Não é possível excluir uma categoria que contêm produtos");
 		}
+	}
+	
+	public Categoria fromDTO(CategoriaDTO objDto) {
+		return new Categoria(objDto.getId(), objDto.getName());
 	}
 	
 	public Page<Categoria> findPage(Integer page, Integer linesPerPage, String orderBy, String direction){
