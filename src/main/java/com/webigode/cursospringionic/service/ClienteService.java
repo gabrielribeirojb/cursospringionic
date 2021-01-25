@@ -3,6 +3,8 @@ package com.webigode.cursospringionic.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -10,9 +12,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.webigode.cursospringionic.domain.Cidade;
 import com.webigode.cursospringionic.domain.Cliente;
+import com.webigode.cursospringionic.domain.Endereco;
+import com.webigode.cursospringionic.domain.enums.TipoCliente;
 import com.webigode.cursospringionic.dto.ClienteDTO;
+import com.webigode.cursospringionic.dto.ClienteNewDTO;
 import com.webigode.cursospringionic.repositories.ClienteRepository;
+import com.webigode.cursospringionic.repositories.EnderecoRepository;
 import com.webigode.cursospringionic.service.excetions.DataIntegrityException;
 import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
 
@@ -21,6 +28,9 @@ public class ClienteService {
 	
 	@Autowired
 	private ClienteRepository repository;
+	
+	@Autowired
+	private EnderecoRepository enderecoRepository;
 	
 	public Cliente findById(Integer id) {
 		Optional<Cliente> obj = repository.findById(id);
@@ -41,6 +51,14 @@ public class ClienteService {
 		newObj.setName(obj.getName());
 		newObj.setEmail(obj.getEmail());
 	}
+	
+	@Transactional
+	public Cliente insert(Cliente obj) {
+		obj.setId(null);
+		obj = repository.save(obj);
+		enderecoRepository.saveAll(obj.getEnderecos());
+		return obj;
+	}
 
 	public void deleteById(Integer id) {
 		findById(id);
@@ -54,6 +72,25 @@ public class ClienteService {
 	
 	public Cliente fromDTO(ClienteDTO objDto) {
 		return new Cliente(objDto.getId(), objDto.getName(), objDto.getEmail(), null, null);
+	}
+	
+	public Cliente fromDTO(ClienteNewDTO objDto) {
+		Cliente cli = new Cliente(null, objDto.getName(), objDto.getEmail(), objDto.getCpfOuCnpj(), TipoCliente.valueOf(objDto.getTipo()));
+		Cidade cid = new Cidade(objDto.getCidadeId(), null, null);
+		Endereco end = new Endereco(null, objDto.getLogadouro(), objDto.getNumero(), objDto.getComplemento(), objDto.getBairro(), objDto.getCep(), cli, cid);
+		
+		cli.getEnderecos().add(end);
+		cli.getTelefones().add(objDto.getTelefone1());
+		
+		if(objDto.getTelefone2() != null) {
+			cli.getTelefones().add(objDto.getTelefone2());
+		}
+		
+		if (objDto.getTelefone3()!=null) {
+			cli.getTelefones().add(objDto.getTelefone3());
+		}
+		
+		return cli;
 	}
 	
 	public Page<Cliente> findPage(Integer page, Integer linesPerPage, String orderBy, String direction){
