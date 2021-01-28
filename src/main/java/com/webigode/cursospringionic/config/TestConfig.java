@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-
 import com.webigode.cursospringionic.service.DBService;
+import com.webigode.cursospringionic.service.EmailService;
+import com.webigode.cursospringionic.service.MockEmailService;
 
 @Configuration
 @Profile("test")
@@ -21,5 +22,10 @@ public class TestConfig {
 	public boolean instantiateDatabase() throws ParseException {
 		dbService.instantiateTestDatabase();
 		return true;
+	}
+	
+	@Bean
+	public EmailService emailService() {
+		return new MockEmailService();
 	}
 }
