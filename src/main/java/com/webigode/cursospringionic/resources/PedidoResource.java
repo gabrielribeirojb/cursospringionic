@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.webigode.cursospringionic.domain.Categoria;
 import com.webigode.cursospringionic.domain.Pedido;
-import com.webigode.cursospringionic.dto.CategoriaDTO;
 import com.webigode.cursospringionic.service.PedidoService;
 
 @RestController
