@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.webigode.cursospringionic.service.excetions.AuthorizationException;
 import com.webigode.cursospringionic.service.excetions.DataIntegrityException;
 import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
 
@@ -43,6 +44,14 @@ public class ObjectExceptionHandler {
 			err.addError(x.getField(), x.getDefaultMessage());
 		}
 		
+		return ResponseEntity.ok().body(err);
+	}
+	
+	@ExceptionHandler(AuthorizationException.class)
+	public ResponseEntity<StandardError> authorization(AuthorizationException e, HttpServletRequest request){
+		String error = "Erro de autorização";
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.ok().body(err);
 	}
 	

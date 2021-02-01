@@ -16,11 +16,14 @@ import org.springframework.stereotype.Service;
 import com.webigode.cursospringionic.domain.Cidade;
 import com.webigode.cursospringionic.domain.Cliente;
 import com.webigode.cursospringionic.domain.Endereco;
+import com.webigode.cursospringionic.domain.enums.Perfil;
 import com.webigode.cursospringionic.domain.enums.TipoCliente;
 import com.webigode.cursospringionic.dto.ClienteDTO;
 import com.webigode.cursospringionic.dto.ClienteNewDTO;
 import com.webigode.cursospringionic.repositories.ClienteRepository;
 import com.webigode.cursospringionic.repositories.EnderecoRepository;
+import com.webigode.cursospringionic.security.UserSS;
+import com.webigode.cursospringionic.service.excetions.AuthorizationException;
 import com.webigode.cursospringionic.service.excetions.DataIntegrityException;
 import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
 
@@ -37,6 +40,12 @@ public class ClienteService {
 	private EnderecoRepository enderecoRepository;
 	
 	public Cliente findById(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		if (user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
 		Optional<Cliente> obj = repository.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(id));
 	}
