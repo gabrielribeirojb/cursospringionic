@@ -11,8 +11,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.webigode.cursospringionic.service.excetions.AuthorizationException;
 import com.webigode.cursospringionic.service.excetions.DataIntegrityException;
+import com.webigode.cursospringionic.service.excetions.FileException;
 import com.webigode.cursospringionic.service.excetions.ObjectNotFoundException;
 
 @ControllerAdvice
@@ -23,7 +27,7 @@ public class ObjectExceptionHandler {
 		String error = "Object not found";
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
-		return ResponseEntity.ok().body(err);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
 	}
 	
 	@ExceptionHandler(DataIntegrityException.class)
@@ -31,7 +35,7 @@ public class ObjectExceptionHandler {
 		String error = "Não se pode excluir um objeto que tenha outros objetos associados a ele";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
-		return ResponseEntity.ok().body(err);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,7 +48,7 @@ public class ObjectExceptionHandler {
 			err.addError(x.getField(), x.getDefaultMessage());
 		}
 		
-		return ResponseEntity.ok().body(err);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 	
 	@ExceptionHandler(AuthorizationException.class)
@@ -52,7 +56,40 @@ public class ObjectExceptionHandler {
 		String error = "Erro de autorização";
 		HttpStatus status = HttpStatus.FORBIDDEN;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
-		return ResponseEntity.ok().body(err);
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
 	}
+	
+	@ExceptionHandler(FileException.class)
+	public ResponseEntity<StandardError> file(FileException e, HttpServletRequest request){
+		String error = "Erro ao carregar arquivo";
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+	
+	@ExceptionHandler(AmazonServiceException.class)
+	public ResponseEntity<StandardError> amazonService(AmazonServiceException e, HttpServletRequest request){
+		String error = "Erro ao carregar serviço Amazon";
+		HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
+		StandardError err = new StandardError(Instant.now(), code.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(code).body(err);
+	}
+	
+	@ExceptionHandler(AmazonClientException.class)
+	public ResponseEntity<StandardError> amazonClient(AmazonClientException e, HttpServletRequest request){
+		String error = "Erro ao carregar client da Amazon";
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+	
+	@ExceptionHandler(AmazonS3Exception.class)
+	public ResponseEntity<StandardError> amazonS3(AmazonS3Exception e, HttpServletRequest request){
+		String error = "Erro ao carregar AmazonS3";
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+	
 	
 }
