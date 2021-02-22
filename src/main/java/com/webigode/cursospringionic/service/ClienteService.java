@@ -70,6 +70,22 @@ public class ClienteService {
 		return repository.findAll();
 	}
 	
+	public Cliente findByEmail(String email) {
+		UserSS user = UserService.authenticated();
+		if (user==null || !user.hasRole(Perfil.ADMIN) && !email.equals(user.getUsername())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
+		Cliente obj = repository.findByEmail(email);
+		
+		if(obj == null) {
+			throw new ObjectNotFoundException(user.getId());
+		}
+		
+		return obj;
+		
+	}
+	
 	public Cliente update(Cliente obj, Integer id) {
 		Cliente newObj = findById(obj.getId());
 		updateData(newObj, obj);
