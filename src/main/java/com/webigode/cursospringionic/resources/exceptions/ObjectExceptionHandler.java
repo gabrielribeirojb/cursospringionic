@@ -41,19 +41,19 @@ public class ObjectExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request){
 		String error ="Erro na validação do campo";
-		HttpStatus status = HttpStatus.BAD_REQUEST;
+		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 		ValidationError err = new ValidationError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		
 		for(FieldError x : e.getBindingResult().getFieldErrors()) {
 			err.addError(x.getField(), x.getDefaultMessage());
 		}
 		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err);
 	}
 	
 	@ExceptionHandler(AuthorizationException.class)
 	public ResponseEntity<StandardError> authorization(AuthorizationException e, HttpServletRequest request){
-		String error = "Erro de autorização";
+		String error = "Acesso negado";
 		HttpStatus status = HttpStatus.FORBIDDEN;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
@@ -69,7 +69,7 @@ public class ObjectExceptionHandler {
 	
 	@ExceptionHandler(AmazonServiceException.class)
 	public ResponseEntity<StandardError> amazonService(AmazonServiceException e, HttpServletRequest request){
-		String error = "Erro ao carregar serviço Amazon";
+		String error = "Erro Amazon Service";
 		HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
 		StandardError err = new StandardError(Instant.now(), code.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(code).body(err);
@@ -77,7 +77,7 @@ public class ObjectExceptionHandler {
 	
 	@ExceptionHandler(AmazonClientException.class)
 	public ResponseEntity<StandardError> amazonClient(AmazonClientException e, HttpServletRequest request){
-		String error = "Erro ao carregar client da Amazon";
+		String error = "Erro Amazon Client";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
@@ -85,7 +85,7 @@ public class ObjectExceptionHandler {
 	
 	@ExceptionHandler(AmazonS3Exception.class)
 	public ResponseEntity<StandardError> amazonS3(AmazonS3Exception e, HttpServletRequest request){
-		String error = "Erro ao carregar AmazonS3";
+		String error = "Erro AmazonS3";
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		StandardError err = new StandardError(Instant.now(), status.value(), error, e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
