@@ -36,7 +36,7 @@ public class CategoriaService {
 		return repository.save(obj);
 	}
 	
-	public Categoria update(Categoria obj, Integer id) {
+	public Categoria update(Categoria obj) {
 		Categoria newObj = findById(obj.getId());
 		updateData(newObj, obj);
 		return repository.save(newObj);
