@@ -25,6 +25,10 @@ import com.webigode.cursospringionic.domain.Categoria;
 import com.webigode.cursospringionic.dto.CategoriaDTO;
 import com.webigode.cursospringionic.service.CategoriaService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping(value="categorias")
 public class CategoriaResource {
@@ -33,12 +37,14 @@ public class CategoriaResource {
 	private CategoriaService service;
 	
 	@GetMapping
+	@ApiOperation(value="Retorna todas categorias")
 	public ResponseEntity<List<CategoriaDTO>> findAll(){
 		List<Categoria> list = service.findAll();
 		List<CategoriaDTO> listDto = list.stream().map(x -> new CategoriaDTO(x)).collect(Collectors.toList());
 		return ResponseEntity.ok().body(listDto);
 	}
 	
+	@ApiOperation(value="Busca por id")
 	@GetMapping(value="/{id}")
 	public ResponseEntity<Categoria> findById(@PathVariable Integer id) {
 		Categoria obj = service.findById(id);
@@ -46,6 +52,7 @@ public class CategoriaResource {
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value="Insere categoria")
 	@PostMapping
 	public ResponseEntity<Void> insert(@Valid @RequestBody CategoriaDTO objDto){
 		Categoria obj = service.fromDTO(objDto);
@@ -55,6 +62,7 @@ public class CategoriaResource {
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value="Atualiza categoria")
 	@PutMapping(value="/{id}")
 	public ResponseEntity<Void> update(@Valid @RequestBody CategoriaDTO objDto, @PathVariable Integer id){
 		Categoria obj = service.fromDTO(objDto);
@@ -64,6 +72,10 @@ public class CategoriaResource {
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")
+	@ApiOperation(value="Remove categoria")
+	@ApiResponses(value = {
+			@ApiResponse(code = 400, message = "Não é possível excluir uma categoria que possui produtos"),
+			@ApiResponse(code = 404, message = "Código inexistente") })
 	@DeleteMapping(value="/{id}")
 	public ResponseEntity<Void> deleteById(@PathVariable Integer id){
 		service.deleteById(id);
@@ -71,6 +83,7 @@ public class CategoriaResource {
 	}
 	
 	@GetMapping(value="/page")
+	@ApiOperation(value="Retorna todas categorias com paginação")
 	public ResponseEntity<Page<CategoriaDTO>> findPage(
 			@RequestParam(value="page", defaultValue="0")Integer page, 
 			@RequestParam(value="linesPerPage", defaultValue="24")Integer linesPerPage, 
